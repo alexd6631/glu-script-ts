@@ -3,11 +3,13 @@ packages:
   - apps/*
 
 tasks:
+  check:
+    concurrency: 4
   build:
-    concurrency: 8
+    concurrency: 4
     dependsOn:
       - ^build
   format:
-    concurrency: 8
+    concurrency: 4
   test:
     concurrency: 4

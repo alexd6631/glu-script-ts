@@ -3,7 +3,7 @@
     "allowArbitraryExtensions": true,
     "declaration": true,
     "declarationMap": true,
-    "lib": ["es2023"],
+    "lib": ["es2023", "DOM"],
     "types": ["vitest/globals"],
     "module": "NodeNext",
     "outDir": "./dist",

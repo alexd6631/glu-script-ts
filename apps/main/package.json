@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "format": "oxfmt",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "check": "tsc"
   },
   "dependencies": {
     "@glu-script/core": "workspace:*",
