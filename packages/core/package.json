@@ -1,0 +1,17 @@
+{
+  "name": "@glu-script/core",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "format": "oxfmt",
+    "lint": "oxlint",
+    "test": "vitest -c ../vitest.config.mjs",
+    "prepack": "pnpm build"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  }
+}

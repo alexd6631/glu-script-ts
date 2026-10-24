@@ -1,0 +1,13 @@
+packages:
+  - packages/*
+  - apps/*
+
+tasks:
+  build:
+    concurrency: 8
+    dependsOn:
+      - ^build
+  format:
+    concurrency: 8
+  test:
+    concurrency: 4
