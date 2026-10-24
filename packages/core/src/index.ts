@@ -1,7 +1,18 @@
 import { parse } from './lib/compiler.js';
 import { Evaluator } from './lib/evaluator.js';
 import { GluConversionError } from './lib/errors.js';
-import { bool, list, NativeFn, nil, number, object, str, type GluValue } from './lib/value.js';
+import {
+  bool,
+  list,
+  NativeFn,
+  nil,
+  number,
+  object,
+  str,
+  unknown,
+  type GluValue,
+} from './lib/value.js';
+import { assertUnreachable } from './lib/utils.ts';
 
 export { GluError, GluParseError, GluEvalError, GluConversionError } from './lib/errors.js';
 
@@ -44,11 +55,13 @@ function fromJs(value: unknown): GluValue {
       }
       const proto = Object.getPrototypeOf(value);
       if (proto !== Object.prototype && proto !== null) {
-        throw new GluConversionError('Only plain records can be converted to a GluValue.');
+        return unknown(value);
       }
-      if (Object.getOwnPropertySymbols(value).length > 0) {
-        throw new GluConversionError('Record keys must be strings to be converted to a GluValue.');
-      }
+
+      // if (Object.getOwnPropertySymbols(value).length > 0) {
+      //   throw new GluConversionError('Record keys must be strings to be converted to a GluValue.');
+      // }
+
       const fields = new Map<string, GluValue>();
       for (const key of Object.keys(value)) {
         fields.set(key, fromJs((value as Record<string, unknown>)[key]));
@@ -82,6 +95,10 @@ function toJs(value: GluValue): unknown {
       return '<closure>';
     case 'native':
       return '<native_fn>';
+    case 'unknown':
+      return value.value;
+    default:
+      assertUnreachable(value);
   }
 }
 

@@ -83,15 +83,16 @@ expressions; a block evaluates to the value of its last expression.
 
 ### Values
 
-| Literal | Example                                |
-| ------- | -------------------------------------- |
-| number  | `42`, `2.5` (a bare `.5` is not valid) |
-| string  | `"hello"` (double quotes, no escapes)  |
-| bool    | `true`, `false`                        |
-| nil     | `nil`                                  |
-| list    | `[1, "two", [3]]`                      |
-| object  | `{ name: "glu", year: 2026 }`          |
-| closure | `\|x, y\| x + y`                       |
+| Literal | Example                                                       |
+| ------- | ------------------------------------------------------------- |
+| number  | `42`, `2.5` (a bare `.5` is not valid)                        |
+| string  | `"hello"` (double quotes, no escapes)                         |
+| bool    | `true`, `false`                                               |
+| nil     | `nil`                                                         |
+| list    | `[1, "two", [3]]`                                             |
+| object  | `{ name: "glu", year: 2026 }`                                 |
+| closure | `\|x, y\| x + y`                                              |
+| unknown | no literal — opaque host values, see [below](#unknown-values) |
 
 - Comments start with `//` and run to the end of the line.
 - Strings have no escape sequences; a double quote cannot appear inside a
@@ -209,10 +210,13 @@ fold(map(range(0, 5), |x| x * 2), 0, |acc, x| acc + x)  // 20
 `compile(source, runtime?)` returns `async (input?: Record<string, unknown>) => unknown`.
 
 - Input record values convert: `null`/`undefined` → `nil`, arrays → lists,
-  plain objects → objects. Class instances and symbol-keyed records are
-  rejected.
+  plain objects (prototype `Object.prototype` or `null`) → objects. Any other
+  JS value — class instances, `Date`, `RegExp`, `Map`, ... — becomes an
+  opaque `unknown` value (see below) instead of being rejected. Symbol-keyed
+  properties of plain records are silently dropped.
 - Results convert back: `nil` → `undefined`, lists → arrays, objects → plain
-  records, closures → `'<closure>'`, native functions → `'<native_fn>'`.
+  records, closures → `'<closure>'`, native functions → `'<native_fn>'`, and
+  `unknown` → the original JS value, unchanged.
 - `runtime` functions are exposed as native functions under their record key,
   with arity from `f.length`. Arguments and return values cross the boundary
   as plain JS values; the wrapper awaits, so sync and async functions both
@@ -223,6 +227,38 @@ fold(map(range(0, 5), |x| x * 2), 0, |acc, x| acc + x)  // 20
   `lib/evaluator.js` (`registerGlobal`, `registerNative`, `evaluate`), and the
   value constructors from `lib/value.js`. The package entry point itself only
   re-exports `compile` and the error classes.
+
+### Unknown values
+
+Complex JS values that have no GluScript equivalent — a `Date`, a `RegExp`,
+a class instance — cross the boundary as `unknown`: an opaque wrapper around
+the original reference.
+
+```ts
+const run = compile('format(when)', {
+  format: (d: Date) => d.toISOString(),
+});
+
+await run({ when: new Date('2026-10-24') }); // '2026-10-24T00:00:00.000Z'
+```
+
+Inside a script, an unknown value can only be passed around, not inspected:
+
+- It can be bound with `let`, stored in lists and objects, compared with
+  `==`/`!=` (by reference: two unknowns are equal only if they wrap the same
+  JS value), passed to host (`runtime`) functions, and returned to the host —
+  which receives the original JS value untouched.
+- It is truthy.
+- Everything else is a runtime error: operators reject it, indexing and
+  property access (`d.getTime`) fail. The script cannot reach into the
+  wrapped object at all.
+
+This is deliberate sandboxing. GluScript never exposes dynamic access to JS
+object properties or methods, so a script cannot use a leaked reference to
+escape the language — it can only call the host functions you explicitly
+provide, which act as the sole capabilities granted to the script. Full
+support for structured types such as dates may be added to the language later;
+until then, handle them through host functions.
 
 ### Reserved but not implemented
 

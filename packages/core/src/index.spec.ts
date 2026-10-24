@@ -42,4 +42,43 @@ describe('compile', () => {
 
     expect(result).toEqual([{ id: 'user1' }, { id: 'user2' }]);
   });
+
+  it('should compile and evaluate expression with sync runtime functions', async () => {
+    const compiledExpression = compile(
+      `{
+      let doubled = double(x);
+
+      {
+        doubled: doubled,
+        upper: upper(name)
+      }
+    }`,
+      {
+        double: (n: number) => n * 2,
+        upper: (s: string) => s.toUpperCase(),
+      },
+    );
+
+    const result = await compiledExpression({ x: 21, name: 'glu' });
+
+    expect(result).toEqual({ doubled: 42, upper: 'GLU' });
+  });
+
+  it('should handle unknown values as opaque types', async () => {
+    const compiledExpression = compile(`{
+      [in.date, in.regex]
+    }`);
+
+    const date = new Date();
+    const regex = new RegExp('');
+
+    const result = await compiledExpression({
+      in: {
+        date: date,
+        regex: regex,
+      },
+    });
+
+    expect(result).toEqual([date, regex]);
+  });
 });

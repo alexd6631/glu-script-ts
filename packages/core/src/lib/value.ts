@@ -10,7 +10,8 @@ export type GluValue =
   | { tag: 'list'; items: GluValue[] }
   | { tag: 'object'; fields: Map<string, GluValue> }
   | { tag: 'closure'; closure: Closure }
-  | { tag: 'native'; fn: NativeFn; arity: number };
+  | { tag: 'native'; fn: NativeFn; arity: number }
+  | { tag: 'unknown'; value: unknown };
 
 export interface Closure {
   node: ClosureNode;
@@ -31,6 +32,8 @@ export const closure = (node: ClosureNode, env: Environment): GluValue => ({
   tag: 'closure',
   closure: { node, env },
 });
+
+export const unknown = (value: unknown): GluValue => ({ tag: 'unknown', value });
 
 export function valuesEqual(a: GluValue, _b: GluValue): boolean {
   if (a.tag !== _b.tag) {
@@ -69,6 +72,10 @@ export function valuesEqual(a: GluValue, _b: GluValue): boolean {
     case 'native': {
       const b = _b as typeof a;
       return a.fn === b.fn && a.arity === b.arity;
+    }
+    case 'unknown': {
+      const b = _b as typeof a;
+      return a.value === b.value;
     }
   }
 }
