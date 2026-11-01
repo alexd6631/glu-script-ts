@@ -16,10 +16,10 @@ import {
   astProperty,
   astUnary,
   astVariableRef,
-} from './ast.js';
-import { parse } from './compiler.js';
-import { GluParseError } from './errors.js';
-import { bool, nil, number, str } from './value.js';
+} from './ast.ts';
+import { parse } from './parser.ts';
+import { GluParseError } from './errors.ts';
+import { bool, nil, number, str } from './value.ts';
 
 const n = (value: number) => astLiteral(number(value));
 const s = (value: string) => astLiteral(str(value));

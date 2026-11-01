@@ -16,7 +16,8 @@
     "check": "pnpm -r check",
     "format": "pnpm -r format",
     "lint": "pnpm -r lint",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "check:all": "pnpm format && pnpm check && pnpm lint && pnpm test"
   },
   "devDependencies": {
     "oxfmt": "^0.74.0",

@@ -223,7 +223,7 @@ fold(map(range(0, 5), |x| x * 2), 0, |acc, x| acc + x)  // 20
   work. A GluScript closure passed to a host function arrives as the string
   `'<closure>'` — host functions cannot call back into GluScript closures.
 - For lower-level control, import the internals directly (they ship in
-  `dist/lib/...`): `parse` from `lib/compiler.js`, the `Evaluator` class from
+  `dist/lib/...`): `parse` from `lib/parser.js`, the `Evaluator` class from
   `lib/evaluator.js` (`registerGlobal`, `registerNative`, `evaluate`), and the
   value constructors from `lib/value.js`. The package entry point itself only
   re-exports `compile` and the error classes.

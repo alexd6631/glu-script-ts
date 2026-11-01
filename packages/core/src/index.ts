@@ -1,4 +1,4 @@
-import { parse } from './lib/compiler.js';
+import { parse } from './lib/parser.ts';
 import { Evaluator } from './lib/evaluator.js';
 import { GluConversionError } from './lib/errors.js';
 import {

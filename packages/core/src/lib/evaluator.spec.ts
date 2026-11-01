@@ -1,4 +1,4 @@
-import { parse } from './compiler.js';
+import { parse } from './parser.ts';
 import { Evaluator, evaluateValue } from './evaluator.js';
 import { bool, list, nil, number as numValue, str } from './value.js';
 

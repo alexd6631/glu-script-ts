@@ -1,5 +1,5 @@
 import type { AstNode, AstObjectKey, ClosureNode } from './ast.js';
-import { parse } from './compiler.js';
+import { parse } from './parser.ts';
 import { Environment } from './environment.js';
 import { GluEvalError } from './errors.js';
 import { registerStdlib } from './stdlib.js';
